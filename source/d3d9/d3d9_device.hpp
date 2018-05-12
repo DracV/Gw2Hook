@@ -6,14 +6,17 @@
 #pragma once
 
 #include "d3d9.hpp"
+#include "../gw2/hook_gw2.hpp"
 
 struct Direct3DDevice9 : IDirect3DDevice9Ex
 {
 	explicit Direct3DDevice9(IDirect3DDevice9   *original) :
 		_orig(original),
+		_redirect(new hook_gw2(this)),
 		_extended_interface(false) { }
 	explicit Direct3DDevice9(IDirect3DDevice9Ex *original) :
 		_orig(original),
+		_redirect(new hook_gw2(this)),
 		_extended_interface(true) { }
 
 	Direct3DDevice9(const Direct3DDevice9 &) = delete;
@@ -162,6 +165,7 @@ struct Direct3DDevice9 : IDirect3DDevice9Ex
 
 	LONG _ref = 1;
 	IDirect3DDevice9 *_orig;
+	hook_gw2 *_redirect;
 	bool _extended_interface;
 	Direct3DSwapChain9 *_implicit_swapchain = nullptr;
 	std::vector<Direct3DSwapChain9 *> _additional_swapchains;
