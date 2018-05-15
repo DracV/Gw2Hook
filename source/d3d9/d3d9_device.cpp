@@ -210,6 +210,7 @@ UINT STDMETHODCALLTYPE Direct3DDevice9::GetNumberOfSwapChains()
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresentationParameters)
 {
+
 	LOG(INFO) << "Redirecting '" << "IDirect3DDevice9::Reset" << "(" << this << ", " << pPresentationParameters << ")' ...";
 
 	if (pPresentationParameters == nullptr)
@@ -223,6 +224,18 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresent
 	assert(_implicit_swapchain->_runtime != nullptr);
 
 	const auto runtime = _implicit_swapchain->_runtime;
+
+	D3DPRESENT_PARAMETERS _pParam;
+	_implicit_swapchain->GetPresentParameters(&_pParam);
+
+	if (_reset_fail_guard) {
+		_reset_fail_guard = false;
+		LOG(INFO) << "> Force reset.";
+	}
+	else if (!_reset_fail_guard && _pParam.BackBufferHeight == pPresentationParameters->BackBufferHeight && _pParam.BackBufferWidth == pPresentationParameters->BackBufferWidth) {
+		LOG(INFO) << "> Same buffer size, skip reset.";
+		return 0;
+	}
 
 	runtime->on_reset();
 
@@ -261,7 +274,12 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice9::Present(const RECT *pSourceRect, cons
 	_redirect->OnPresent();
 	_implicit_swapchain->_runtime->on_present();
 
-	return _orig->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+	HRESULT hr = _orig->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+
+	if (FAILED(hr)) {
+		_reset_fail_guard = true;
+	}
+	return hr;
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice9::GetBackBuffer(UINT iSwapChain, UINT iBackBuffer, D3DBACKBUFFER_TYPE Type, IDirect3DSurface9 **ppBackBuffer)
 {

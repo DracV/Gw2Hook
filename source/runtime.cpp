@@ -1943,7 +1943,6 @@ namespace reshade
 			ImGui::TextUnformatted("Draw Calls:");
 			ImGui::Text("Frame %llu:", _framecount + 1);
 			ImGui::TextUnformatted("Timer:");
-			ImGui::TextUnformatted("Network:");
 			ImGui::EndGroup();
 
 			ImGui::SameLine(ImGui::GetWindowWidth() * 0.333f);
