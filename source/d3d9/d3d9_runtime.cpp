@@ -942,6 +942,7 @@ namespace reshade::d3d9
 
 	bool d3d9_runtime::create_depthstencil_replacement(IDirect3DSurface9 *depthstencil)
 	{
+		LOG(INFO) << "REPLACMENT";
 		_depthstencil.reset();
 		_depthstencil_replacement.reset();
 		_depthstencil_texture.reset();

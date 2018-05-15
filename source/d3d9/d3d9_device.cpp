@@ -231,10 +231,9 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresent
 	if (_reset_fail_guard) {
 		_reset_fail_guard = false;
 		LOG(INFO) << "> Force reset.";
-	}
-	else if (!_reset_fail_guard && _pParam.BackBufferHeight == pPresentationParameters->BackBufferHeight && _pParam.BackBufferWidth == pPresentationParameters->BackBufferWidth) {
+	} else if (!_reset_fail_guard && _pParam.BackBufferHeight == pPresentationParameters->BackBufferHeight && _pParam.BackBufferWidth == pPresentationParameters->BackBufferWidth) {
 		LOG(INFO) << "> Same buffer size, skip reset.";
-		return 0;
+		return D3D_OK;
 	}
 
 	runtime->on_reset();
